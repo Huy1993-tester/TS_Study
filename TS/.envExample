@@ -1,0 +1,4 @@
+username: "yourname",
+password: "yourpass",
+database: "yourdb",
+host: "yourhost",

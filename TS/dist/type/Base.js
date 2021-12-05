@@ -9,21 +9,29 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HelloUser = void 0;
+exports.Base = void 0;
 const type_graphql_1 = require("type-graphql");
-let HelloUser = class HelloUser {
-    hello() {
-        return "hello";
-    }
+const typeorm_1 = require("typeorm");
+let Base = class Base extends typeorm_1.BaseEntity {
 };
 __decorate([
-    (0, type_graphql_1.Query)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], HelloUser.prototype, "hello", null);
-HelloUser = __decorate([
-    (0, type_graphql_1.Resolver)()
-], HelloUser);
-exports.HelloUser = HelloUser;
-//# sourceMappingURL=hello.js.map
+    (0, type_graphql_1.Field)((_type) => type_graphql_1.ID),
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
+], Base.prototype, "id", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", Date)
+], Base.prototype, "createDate", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.UpdateDateColumn)(),
+    __metadata("design:type", Date)
+], Base.prototype, "updateDate", void 0);
+Base = __decorate([
+    (0, type_graphql_1.ObjectType)(),
+    (0, typeorm_1.Entity)()
+], Base);
+exports.Base = Base;
+//# sourceMappingURL=base.js.map

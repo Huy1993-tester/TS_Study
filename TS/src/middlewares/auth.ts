@@ -1,4 +1,5 @@
 import * as jwt from "jsonwebtoken";
+import { baseConfig } from "../config/config";
 
 export class CreateToken {
   public payload: object;
@@ -11,11 +12,11 @@ export class CreateToken {
     };
     this.secretkey = "abc45365";
     this.expires = {
-      expiresIn: Date.now(),
+      expiresIn: baseConfig.tokenExpire,
     };
   }
   public async token(): Promise<string> {
-    const auth: string = await jwt.sign(
+    const auth: string = jwt.sign(
       this.payload,
       this.secretkey,
       this.expires

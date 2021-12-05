@@ -1,21 +1,22 @@
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Args, Mutation, Query, Resolver } from "type-graphql";
+
 import { User } from "../entity/User";
-import { Encoding, VerifyEncoding } from "./../middlewares/encoding";
 import { CreateToken } from "./../middlewares/auth";
 import { Messages } from "../messages/mess";
+import { CreateUserBody, SignInResponse, UpdateUserBody, } from "../type/user";
+import { Encoding, VerifyEncoding } from "../middlewares/encoding";
 @Resolver()
 export class UserResolver {
-  @Query(() => User)
-  helloUser() {
+  @Query()
+  helloUser(): string {
     return "Hello All Guys";
   }
 
-  @Mutation(() => User, { nullable: false })
-  async createUser(
-    @Arg("username") username: string,
-    @Arg("email") email: string,
-    @Arg("password") password: string
+  @Mutation(() => User)
+  public async createUser(
+    @Args() createUserBody: CreateUserBody
   ): Promise<User | string> {
+    const { username, email, password } = createUserBody
     try {
       const exists = await User.findOne({ email });
       if (exists) throw new Error("User tồn tại");
@@ -34,25 +35,25 @@ export class UserResolver {
     }
   }
 
-  @Mutation(() => String, { nullable: false })
-  async signIn(
+  @Mutation(()=>SignInResponse)
+  public async signIn(
     @Arg("email") email: string,
     @Arg("password") password: string
-  ): Promise<String> {
+  ): Promise<SignInResponse> {
     try {
       const findUser: any = await User.findOne({ where: { email } });
       if (findUser !== undefined) {
-        const verifyEncoding = await new VerifyEncoding(
+        const verifyEncoding = new VerifyEncoding(
           password,
           findUser.password
         );
         const isCheck: boolean = await verifyEncoding.verifyEncoding();
-        if (isCheck == true) {
-          const auth = await new CreateToken(findUser.email, findUser.id);
+        if (isCheck) {
+          const auth = new CreateToken(findUser.email, findUser.id);
           const token = await auth.token().then((t) => {
             return t;
           });
-          return token;
+          return {token};
         } else {
           throw new Error("Pass not matching!");
         }
@@ -64,15 +65,14 @@ export class UserResolver {
     }
   }
 
-  @Mutation(() => User, { nullable: false })
-  async updateUser(
-    @Arg("id") id: number,
-    @Arg("username") username: string,
-    @Arg("email") email: string
+  @Mutation(() => User)
+  public async updateUser(
+    @Args() updateBody: UpdateUserBody
   ): Promise<User> {
+    const { id, username, email } = updateBody
     try {
       const findUser = await User.findOne({ where: { id } });
-      if (findUser !== undefined) {
+      if (findUser) {
         findUser.username = username;
         findUser.email = email;
         await User.save(findUser);
@@ -85,13 +85,13 @@ export class UserResolver {
     }
   }
 
-  @Mutation(() => String, { nullable: false })
-  async removeUser(@Arg("id") id: number): Promise<string> {
+  @Mutation(() => String)
+  public async removeUser(@Arg("id") id: number): Promise<string> {
     try {
       const findUser = await User.findOne({ where: { id } });
       if (findUser !== undefined) {
         await User.remove(findUser);
-        const mess = await new Messages("User delete successfuly!");
+        const mess = new Messages("User delete successfuly!");
         return mess.showMess();
       } else {
         throw new Error("User not exits!");

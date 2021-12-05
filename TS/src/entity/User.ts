@@ -1,20 +1,14 @@
-import { Field, ID, ObjectType } from "type-graphql";
+import { Field, ObjectType } from "type-graphql";
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  BaseEntity,
 } from "typeorm";
+
+import { Base } from "../type/base";
 
 @ObjectType()
 @Entity()
-export class User extends BaseEntity {
-  @Field((_type) => ID)
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class User extends Base {
   @Field()
   @Column({ length: 20 })
   username!: string;
@@ -29,12 +23,4 @@ export class User extends BaseEntity {
   @Field()
   @Column({ default: "CLIENT" })
   role!: string;
-
-  @Field()
-  @CreateDateColumn()
-  createDate: Date;
-
-  @Field()
-  @UpdateDateColumn()
-  updateDate: Date;
 }

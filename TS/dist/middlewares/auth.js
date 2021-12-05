@@ -21,6 +21,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateToken = void 0;
 const jwt = __importStar(require("jsonwebtoken"));
+const config_1 = require("../config/config");
 class CreateToken {
     constructor(dataEmail, dataId) {
         this.payload = {
@@ -29,11 +30,11 @@ class CreateToken {
         };
         this.secretkey = "abc45365";
         this.expires = {
-            expiresIn: Date.now(),
+            expiresIn: config_1.baseConfig.tokenExpire,
         };
     }
     async token() {
-        const auth = await jwt.sign(this.payload, this.secretkey, this.expires);
+        const auth = jwt.sign(this.payload, this.secretkey, this.expires);
         return auth;
     }
 }

@@ -1,1 +1,0 @@
-{"version":3,"file":"user.js","sourceRoot":"","sources":["../../src/resolver/user.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,qCAA6D;AAI7D,IAAa,IAAI,GAAjB,MAAa,IAAI;CAOhB,CAAA;AALG;IADC,IAAA,gCAAsB,GAAE;;gCACf;AAEV;IADC,IAAA,gBAAM,EAAC,EAAC,MAAM,EAAC,EAAE,EAAC,CAAC;;kCACR;AAEZ;IADC,IAAA,gBAAM,GAAE;;iCACE;AANF,IAAI;IADhB,IAAA,gBAAM,GAAE;GACI,IAAI,CAOhB;AAPY,oBAAI"}

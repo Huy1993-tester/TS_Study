@@ -15,14 +15,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserResolver = void 0;
 const type_graphql_1 = require("type-graphql");
 const User_1 = require("../entity/User");
-const encoding_1 = require("./../middlewares/encoding");
 const auth_1 = require("./../middlewares/auth");
 const mess_1 = require("../messages/mess");
+const user_1 = require("../type/user");
+const encoding_1 = require("../middlewares/encoding");
 let UserResolver = class UserResolver {
     helloUser() {
         return "Hello All Guys";
     }
-    async createUser(username, email, password) {
+    async createUser(createUserBody) {
+        const { username, email, password } = createUserBody;
         try {
             const exists = await User_1.User.findOne({ email });
             if (exists)
@@ -46,14 +48,14 @@ let UserResolver = class UserResolver {
         try {
             const findUser = await User_1.User.findOne({ where: { email } });
             if (findUser !== undefined) {
-                const verifyEncoding = await new encoding_1.VerifyEncoding(password, findUser.password);
+                const verifyEncoding = new encoding_1.VerifyEncoding(password, findUser.password);
                 const isCheck = await verifyEncoding.verifyEncoding();
-                if (isCheck == true) {
-                    const auth = await new auth_1.CreateToken(findUser.email, findUser.id);
+                if (isCheck) {
+                    const auth = new auth_1.CreateToken(findUser.email, findUser.id);
                     const token = await auth.token().then((t) => {
                         return t;
                     });
-                    return token;
+                    return { token };
                 }
                 else {
                     throw new Error("Pass not matching!");
@@ -67,10 +69,11 @@ let UserResolver = class UserResolver {
             throw new Error(error);
         }
     }
-    async updateUser(id, username, email) {
+    async updateUser(updateBody) {
+        const { id, username, email } = updateBody;
         try {
             const findUser = await User_1.User.findOne({ where: { id } });
-            if (findUser !== undefined) {
+            if (findUser) {
                 findUser.username = username;
                 findUser.email = email;
                 await User_1.User.save(findUser);
@@ -89,7 +92,7 @@ let UserResolver = class UserResolver {
             const findUser = await User_1.User.findOne({ where: { id } });
             if (findUser !== undefined) {
                 await User_1.User.remove(findUser);
-                const mess = await new mess_1.Messages("User delete successfuly!");
+                const mess = new mess_1.Messages("User delete successfuly!");
                 return mess.showMess();
             }
             else {
@@ -102,22 +105,20 @@ let UserResolver = class UserResolver {
     }
 };
 __decorate([
-    (0, type_graphql_1.Query)(() => User_1.User),
+    (0, type_graphql_1.Query)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", String)
 ], UserResolver.prototype, "helloUser", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => User_1.User, { nullable: false }),
-    __param(0, (0, type_graphql_1.Arg)("username")),
-    __param(1, (0, type_graphql_1.Arg)("email")),
-    __param(2, (0, type_graphql_1.Arg)("password")),
+    (0, type_graphql_1.Mutation)(() => User_1.User),
+    __param(0, (0, type_graphql_1.Args)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String]),
+    __metadata("design:paramtypes", [user_1.CreateUserBody]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "createUser", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => String, { nullable: false }),
+    (0, type_graphql_1.Mutation)(() => user_1.SignInResponse),
     __param(0, (0, type_graphql_1.Arg)("email")),
     __param(1, (0, type_graphql_1.Arg)("password")),
     __metadata("design:type", Function),
@@ -125,16 +126,14 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "signIn", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => User_1.User, { nullable: false }),
-    __param(0, (0, type_graphql_1.Arg)("id")),
-    __param(1, (0, type_graphql_1.Arg)("username")),
-    __param(2, (0, type_graphql_1.Arg)("email")),
+    (0, type_graphql_1.Mutation)(() => User_1.User),
+    __param(0, (0, type_graphql_1.Args)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, String, String]),
+    __metadata("design:paramtypes", [user_1.UpdateUserBody]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "updateUser", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(() => String, { nullable: false }),
+    (0, type_graphql_1.Mutation)(() => String),
     __param(0, (0, type_graphql_1.Arg)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),

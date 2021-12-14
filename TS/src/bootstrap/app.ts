@@ -1,11 +1,14 @@
-import express, { Express } from 'express';
-import http, { Server } from 'http';
+import express, { Express } from "express";
+import http, { Server } from "http";
 import { createConnection } from "typeorm";
 import { ApolloServer } from "apollo-server-express";
 import { ApolloServerPluginDrainHttpServer, Context } from "apollo-server-core";
-
 import { createGraphqlSchema } from "./createSchema";
 import { User } from "../entity/User";
+import { Comment } from "../entity/Comment";
+import { Like } from './../entity/Like';
+import { Movie } from './../entity/Movie';
+import { Rap } from "../entity/Rap";
 
 export class App {
   public readonly PORT: number;
@@ -13,10 +16,10 @@ export class App {
   public readonly httpServer: Server;
 
   constructor() {
-    this.app = express()
+    this.app = express();
     this.PORT = Number(process.env.PORT) || 3000;
     this.httpServer = http.createServer(this.app);
-    this.bootstrap()
+    this.bootstrap();
   }
 
   public async bootstrap(): Promise<void> {
@@ -31,17 +34,19 @@ export class App {
       port: 3306,
       synchronize: true,
       logging: true,
-      entities: [User]
+      entities: [User,Comment,Like,Movie,Rap],
     });
-    await this.startGraphql()
+    await this.startGraphql();
   }
 
   public async startGraphql(): Promise<void> {
-    const schema = await createGraphqlSchema()
+    const schema = await createGraphqlSchema();
     const apolloServer = new ApolloServer({
       schema,
       context: ({ req, res }): Context => ({ req, res }),
-      plugins: [ApolloServerPluginDrainHttpServer({ httpServer: this.httpServer })],
+      plugins: [
+        ApolloServerPluginDrainHttpServer({ httpServer: this.httpServer }),
+      ],
     });
     await apolloServer.start();
     apolloServer.applyMiddleware({ app: this.app, cors: true });

@@ -10,7 +10,7 @@ export class CreateUserBody {
 
   @Field()
   public email: string;
-
+  
   @Field()
   public role: string;
 }

@@ -2,13 +2,15 @@ import express, { Express } from "express";
 import http, { Server } from "http";
 import { createConnection } from "typeorm";
 import { ApolloServer } from "apollo-server-express";
-import { ApolloServerPluginDrainHttpServer, Context } from "apollo-server-core";
+import { ApolloServerPluginDrainHttpServer } from "apollo-server-core";
 import { createGraphqlSchema } from "./createSchema";
 import { User } from "../entity/User";
 import { Comment } from "../entity/Comment";
 import { Like } from './../entity/Like';
 import { Movie } from './../entity/Movie';
 import { Rap } from "../entity/Rap";
+import { authTokenMiddleware } from "src/middlewares/auth";
+import { AuthedContext, AuthedRequest } from "src/type/auth";
 
 export class App {
   public readonly PORT: number;
@@ -25,6 +27,7 @@ export class App {
   public async bootstrap(): Promise<void> {
     // Add more middlewares
     // this.app.use()
+    this.app.use(authTokenMiddleware)
     await createConnection({
       type: "mysql",
       username: "uusax0bnncjk4sdj",
@@ -43,7 +46,7 @@ export class App {
     const schema = await createGraphqlSchema();
     const apolloServer = new ApolloServer({
       schema,
-      context: ({ req, res }): Context => ({ req, res }),
+      context: ({ req, res }): AuthedContext => new AuthedContext(req as AuthedRequest, res),
       plugins: [
         ApolloServerPluginDrainHttpServer({ httpServer: this.httpServer }),
       ],

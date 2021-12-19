@@ -30,14 +30,15 @@ export class Authorticator {
     this.token = token;
     this.secretkey = "abc45365";
   }
-  public async verifyAuthorCreateUser(): Promise<User> {
+  public async responseInfoUser(): Promise<User> {
     const user: any = await (<any>jwt.verify(this.token, this.secretkey));
     return user;
   }
-  public async verifyAuthenticator():Promise<boolean> {
-    const us: any = await this.verifyAuthorCreateUser();
+  public async verifyRole(): Promise<boolean> {
+    const info = await this.responseInfoUser();
     const extention = ["ADMIN", "SUPPERADMIN"];
-    const isReq = await extention.includes(us.role);
-    return isReq
+    const isReq = await extention.includes(info.role);
+    return isReq;
   }
 }
+

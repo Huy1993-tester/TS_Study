@@ -8,7 +8,8 @@
     "serve": "nodemon dist/index.js",
     "start-ts": "ts-node src/index.ts",
     "serve-ts": "nodemon --exec ts-node src/index.ts",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -27,9 +28,14 @@
     "mysql": "^2.18.1",
     "nodemon": "^2.0.15",
     "reflect-metadata": "^0.1.13",
+    "supertest": "^6.1.6",
+    "ts-jest": "^27.1.2",
     "ts-node": "^10.4.0",
     "type-graphql": "^1.1.1",
     "typeorm": "^0.2.41",
     "typescript": "^4.5.2"
+  },
+  "devDependencies": {
+    "jest": "^27.4.5"
   }
 }

@@ -27,8 +27,8 @@ __decorate([
     __metadata("design:type", String)
 ], Rap.prototype, "address", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => Movie_1.Movie),
-    __metadata("design:type", Movie_1.Movie)
+    (0, typeorm_1.ManyToMany)(() => Movie_1.Movie, (movie) => movie.rap),
+    __metadata("design:type", Promise)
 ], Rap.prototype, "movie", void 0);
 Rap = __decorate([
     (0, type_graphql_1.ObjectType)(),

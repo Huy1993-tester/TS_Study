@@ -14,6 +14,6 @@ export class Rap extends BaseET {
   @Column()
   address: string;
 
-  @ManyToMany(() => Movie)
-  movie: Movie;
+  @ManyToMany(() => Movie, (movie) => movie.rap)
+  movie: Promise<Movie[]>;
 }

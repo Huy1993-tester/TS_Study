@@ -9,30 +9,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MB = void 0;
+exports.MovieBody = void 0;
 const type_graphql_1 = require("type-graphql");
 let MovieBody = class MovieBody {
 };
 __decorate([
     (0, type_graphql_1.Field)(),
-    __metadata("design:type", String)
-], MovieBody.prototype, "film", void 0);
+    __metadata("design:type", Number)
+], MovieBody.prototype, "movieId", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
-    __metadata("design:type", String)
-], MovieBody.prototype, "derciption", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    __metadata("design:type", String)
-], MovieBody.prototype, "cinema", void 0);
-__decorate([
-    (0, type_graphql_1.Field)(),
-    __metadata("design:type", String)
-], MovieBody.prototype, "address", void 0);
+    __metadata("design:type", Number)
+], MovieBody.prototype, "rapId", void 0);
 MovieBody = __decorate([
     (0, type_graphql_1.InterfaceType)()
 ], MovieBody);
-class MB extends MovieBody {
-}
-exports.MB = MB;
+exports.MovieBody = MovieBody;
 //# sourceMappingURL=movie.js.map

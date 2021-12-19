@@ -28,7 +28,7 @@ let MovieResolver = class MovieResolver {
             const movie = new Movie_1.Movie();
             movie.film = film;
             movie.derciption = derciption;
-            return Movie_1.Movie.save(movie);
+            return (0, typeorm_1.getRepository)(Movie_1.Movie).save(movie);
         }
         catch (error) {
             throw new Error(error);
@@ -53,4 +53,6 @@ MovieResolver = __decorate([
     (0, type_graphql_1.Resolver)()
 ], MovieResolver);
 exports.MovieResolver = MovieResolver;
+const movieResolver = new MovieResolver();
+exports.default = movieResolver;
 //# sourceMappingURL=movieResolver.js.map

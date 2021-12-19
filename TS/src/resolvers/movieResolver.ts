@@ -22,9 +22,13 @@ export class MovieResolver {
       const movie = new Movie();
       movie.film = film;
       movie.derciption = derciption;
-      return Movie.save(movie);
+      return getRepository(Movie).save(movie);
     } catch (error) {
       throw new Error(error);
     }
   }
 }
+
+const movieResolver = new MovieResolver();
+
+export default movieResolver;

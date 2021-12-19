@@ -45,14 +45,14 @@ class Authorticator {
         this.token = token;
         this.secretkey = "abc45365";
     }
-    async verifyAuthorCreateUser() {
+    async responseInfoUser() {
         const user = await jwt.verify(this.token, this.secretkey);
         return user;
     }
-    async verifyAuthenticator() {
-        const us = await this.verifyAuthorCreateUser();
+    async verifyRole() {
+        const info = await this.responseInfoUser();
         const extention = ["ADMIN", "SUPPERADMIN"];
-        const isReq = await extention.includes(us.role);
+        const isReq = await extention.includes(info.role);
         return isReq;
     }
 }

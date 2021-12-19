@@ -14,7 +14,7 @@ const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
 const base_1 = require("./../type/base");
 const Rap_1 = require("./Rap");
-let Movie = class Movie extends base_1.BaseET {
+let Movie = class Movie extends base_1.Base {
 };
 __decorate([
     (0, type_graphql_1.Field)(),
@@ -27,10 +27,10 @@ __decorate([
     __metadata("design:type", String)
 ], Movie.prototype, "derciption", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => Rap_1.Rap, { nullable: true }),
+    (0, typeorm_1.ManyToMany)(() => Rap_1.Rap, rap => rap.movie),
     (0, typeorm_1.JoinTable)(),
-    __metadata("design:type", Array)
-], Movie.prototype, "cine", void 0);
+    __metadata("design:type", Promise)
+], Movie.prototype, "rap", void 0);
 Movie = __decorate([
     (0, type_graphql_1.ObjectType)(),
     (0, typeorm_1.Entity)()

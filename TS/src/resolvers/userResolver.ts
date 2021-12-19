@@ -1,94 +1,80 @@
-import { Arg, Args, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Args, Authorized, Mutation, Query, Resolver } from "type-graphql";
 import { getConnection, getManager, getRepository } from "typeorm";
 import { User } from "../entity/User";
-import { Authorticator, CreateToken } from "./../middlewares/auth";
+import {CreateToken } from "./../middlewares/auth";
 import { Messages } from "../messages/mess";
 import { CreateUserBody, SignInResponse } from "../type/user";
 import { Encoding, VerifyEncoding } from "../middlewares/encoding";
 import { UpdateUserBody } from "./../type/user";
-import { Like } from "../entity/Like";
-// import { Movie } from "../entity/Movie";
-
+// import { Like } from "../entity/Like";
 @Resolver()
 export class UserResolver {
-  @Query(() => User)
-  public async findUser(@Arg("userId") userId: number): Promise<User> {
-    const a: any = await getRepository(User)
-      .createQueryBuilder("user")
-      .select("user")
-      .where("user.id = :id", { id: userId })
-      .getOne();
-    return a;
-  }
+  // @Query(() => User)
+  // public async findUser(@Arg("userId") userId: number): Promise<User> {
+  //   const a: any = await getRepository(User)
+  //     .createQueryBuilder("user")
+  //     .select("user")
+  //     .where("user.id = :id", { id: userId })
+  //     .getOne();
+  //   return a;
+  // }
 
-  @Query(() => String)
-  public async findUsernameHaveLikeByTrue(
-    @Arg("isLike") isLike: boolean,
-    @Arg("username") username: string
-  ): Promise<String> {
-    const repository = getRepository(Like);
-    const a = repository.find({
-      join: { alias: "like", innerJoin: { user: "like.user" } },
-      where: {
-        like: isLike,
-        user: {
-          username: username,
-        },
-      },
-    });
+  // @Query(() => String)
+  // public async findUsernameHaveLikeByTrue(
+  //   @Arg("isLike") isLike: boolean,
+  //   @Arg("username") username: string
+  // ): Promise<String> {
+  //   const repository = getRepository(Like);
+  //   const a = repository.find({
+  //     join: { alias: "like", innerJoin: { user: "like.user" } },
+  //     where: {
+  //       like: isLike,
+  //       user: {
+  //         username: username,
+  //       },
+  //     },
+  //   });
 
-    console.log(a.then((r) => console.log(r)));
+  //   console.log(a.then((r) => console.log(r)));
 
-    return "OK";
-  }
+  //   return "OK";
+  // }
 
   @Query(() => String)
   public async findUserAndCommentAndLike(
-    @Arg("like") like:boolean,
-    @Arg("userId") userId:number
-  ):Promise<String>{
+    @Arg("like") like: boolean,
+    @Arg("userId") userId: number
+  ): Promise<String> {
     const a = await getConnection()
       .createQueryBuilder(User, "user")
       .leftJoinAndSelect("user.like", "like")
-      .leftJoinAndSelect("user.comment","comment")
-      .where('like.like=:like',{like})
-      .andWhere('user.id =:userId',{userId})
+      .leftJoinAndSelect("user.comment", "comment")
+      .where("like.like=:like", { like })
+      .andWhere("user.id =:userId", { userId })
       .getMany();
     console.log(a);
-    return "Ok"
+    return "Ok";
   }
 
+  @Authorized()
   @Mutation(() => User)
   public async createUser(
     @Args() createUserBody: CreateUserBody,
-    @Arg("token") token: string
   ): Promise<User | string> {
     const { username, email, password, role } = createUserBody;
     try {
-      const promise = await new Authorticator(token);
-      const user = await promise.verifyAuthorCreateUser().then((t) => {
-        return t;
-      });
-      console.log(user);
-      const isCheck = await promise.verifyAuthenticator().then((t) => {
-        return t;
-      });
-      if (isCheck) {
-        const repository = getRepository(User);
-        const exists = await repository.findOne({ email });
-        if (exists) throw new Error("User tồn tại");
-        else {
-          const encoding = await new Encoding(password);
-          const hash = await encoding.encoding();
-          const newUser = new User();
-          newUser.username = username;
-          newUser.email = email;
-          newUser.password = hash;
-          newUser.role = role;
-          return repository.save(newUser);
-        }
-      } else {
-        throw new Error("User not authortion create user!");
+      const repository = getRepository(User);
+      const exists = await repository.findOne({ email });
+      if (exists) throw new Error("User tồn tại");
+      else {
+        const encoding = await new Encoding(password);
+        const hash = await encoding.encoding();
+        const newUser = new User();
+        newUser.username = username;
+        newUser.email = email;
+        newUser.password = hash;
+        newUser.role = role;
+        return repository.save(newUser);
       }
     } catch (error) {
       throw new Error(error);
@@ -183,8 +169,6 @@ export class UserResolver {
         .from(User, "user")
         .where("user.id = :id", { id })
         .getOne();
-      console.log(findUser);
-
       if (findUser !== undefined) {
         await getConnection()
           .createQueryBuilder()
@@ -202,3 +186,5 @@ export class UserResolver {
     }
   }
 }
+
+

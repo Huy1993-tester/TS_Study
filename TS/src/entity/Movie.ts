@@ -1,11 +1,11 @@
 import { Field, ObjectType } from "type-graphql";
 import { Column, Entity, JoinTable, ManyToMany } from "typeorm";
-import { BaseET } from "./../type/base";
+import { Base } from "./../type/base";
 import { Rap } from "./Rap";
 
 @ObjectType()
 @Entity()
-export class Movie extends BaseET {
+export class Movie  extends Base{
   @Field()
   @Column({ unique: true })
   film: string;
@@ -14,7 +14,7 @@ export class Movie extends BaseET {
   @Column({ length: 255 })
   derciption: string;
 
-  @ManyToMany(() => Rap, { nullable: true })
+  @ManyToMany(() => Rap, rap => rap.movie)
   @JoinTable()
-  cine: Rap[];
+  rap:Promise<Rap[]>;
 }

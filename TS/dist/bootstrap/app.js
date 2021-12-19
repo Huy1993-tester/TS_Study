@@ -11,6 +11,10 @@ const apollo_server_express_1 = require("apollo-server-express");
 const apollo_server_core_1 = require("apollo-server-core");
 const createSchema_1 = require("./createSchema");
 const User_1 = require("../entity/User");
+const Comment_1 = require("../entity/Comment");
+const Like_1 = require("./../entity/Like");
+const Movie_1 = require("./../entity/Movie");
+const Rap_1 = require("../entity/Rap");
 class App {
     constructor() {
         this.app = (0, express_1.default)();
@@ -28,7 +32,7 @@ class App {
             port: 3306,
             synchronize: true,
             logging: true,
-            entities: [User_1.User]
+            entities: [User_1.User, Comment_1.Comment, Like_1.Like, Movie_1.Movie, Rap_1.Rap],
         });
         await this.startGraphql();
     }
@@ -37,7 +41,9 @@ class App {
         const apolloServer = new apollo_server_express_1.ApolloServer({
             schema,
             context: ({ req, res }) => ({ req, res }),
-            plugins: [(0, apollo_server_core_1.ApolloServerPluginDrainHttpServer)({ httpServer: this.httpServer })],
+            plugins: [
+                (0, apollo_server_core_1.ApolloServerPluginDrainHttpServer)({ httpServer: this.httpServer }),
+            ],
         });
         await apolloServer.start();
         apolloServer.applyMiddleware({ app: this.app, cors: true });

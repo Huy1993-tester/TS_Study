@@ -4,12 +4,28 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  BaseEntity,
+  BaseEntity
 } from "typeorm";
 
 @ObjectType()
 @Entity()
-export class Base extends BaseEntity{
+export class Base {
+  @Field((_type) => ID)
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Field()
+  @CreateDateColumn()
+  createDate: Date;
+
+  @Field()
+  @UpdateDateColumn()
+  updateDate: Date;
+}
+
+@ObjectType()
+@Entity()
+export class BaseET extends BaseEntity{
   @Field((_type) => ID)
   @PrimaryGeneratedColumn()
   id: number;

@@ -9,44 +9,31 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
+exports.Movie = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
-const base_1 = require("../type/base");
-const Like_1 = require("./Like");
-const Comment_1 = require("./Comment");
-let User = class User extends base_1.Base {
+const base_1 = require("./../type/base");
+const Rap_1 = require("./Rap");
+let Movie = class Movie extends base_1.BaseET {
 };
-__decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)({ length: 20 }),
-    __metadata("design:type", String)
-], User.prototype, "username", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)({ unique: true }),
     __metadata("design:type", String)
-], User.prototype, "email", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], User.prototype, "password", void 0);
+], Movie.prototype, "film", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)({ default: "CLIENT" }),
+    (0, typeorm_1.Column)({ length: 255 }),
     __metadata("design:type", String)
-], User.prototype, "role", void 0);
+], Movie.prototype, "derciption", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => Comment_1.Comment, (comment) => comment.users),
-    __metadata("design:type", Comment_1.Comment)
-], User.prototype, "comment", void 0);
-__decorate([
-    (0, typeorm_1.OneToMany)(() => Like_1.Like, (like) => like.user),
-    __metadata("design:type", Like_1.Like)
-], User.prototype, "like", void 0);
-User = __decorate([
+    (0, typeorm_1.ManyToMany)(() => Rap_1.Rap, { nullable: true }),
+    (0, typeorm_1.JoinTable)(),
+    __metadata("design:type", Array)
+], Movie.prototype, "cine", void 0);
+Movie = __decorate([
     (0, type_graphql_1.ObjectType)(),
     (0, typeorm_1.Entity)()
-], User);
-exports.User = User;
-//# sourceMappingURL=User.js.map
+], Movie);
+exports.Movie = Movie;
+//# sourceMappingURL=Movie.js.map

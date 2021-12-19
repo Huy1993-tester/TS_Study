@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SignInResponse = exports.UpdateUserBody = exports.CreateUserBody = void 0;
+exports.CreateCommentBody = exports.SignInResponse = exports.UpdateUserBody = exports.CreateUserBody = void 0;
 const type_graphql_1 = require("type-graphql");
 let CreateUserBody = class CreateUserBody {
 };
@@ -25,6 +25,10 @@ __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
 ], CreateUserBody.prototype, "email", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], CreateUserBody.prototype, "role", void 0);
 CreateUserBody = __decorate([
     (0, type_graphql_1.ArgsType)()
 ], CreateUserBody);
@@ -57,4 +61,18 @@ SignInResponse = __decorate([
     (0, type_graphql_1.InterfaceType)()
 ], SignInResponse);
 exports.SignInResponse = SignInResponse;
+let CreateCommentBody = class CreateCommentBody {
+};
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", String)
+], CreateCommentBody.prototype, "comments", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    __metadata("design:type", Number)
+], CreateCommentBody.prototype, "userID", void 0);
+CreateCommentBody = __decorate([
+    (0, type_graphql_1.ArgsType)()
+], CreateCommentBody);
+exports.CreateCommentBody = CreateCommentBody;
 //# sourceMappingURL=user.js.map

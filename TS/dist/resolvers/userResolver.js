@@ -14,30 +14,99 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserResolver = void 0;
 const type_graphql_1 = require("type-graphql");
+const typeorm_1 = require("typeorm");
 const User_1 = require("../entity/User");
 const auth_1 = require("./../middlewares/auth");
 const mess_1 = require("../messages/mess");
 const user_1 = require("../type/user");
 const encoding_1 = require("../middlewares/encoding");
+const user_2 = require("./../type/user");
+const Like_1 = require("../entity/Like");
 let UserResolver = class UserResolver {
-    helloUser() {
-        return "Hello All Guys";
+    async findUser(userId) {
+        const a = await (0, typeorm_1.getRepository)(User_1.User)
+            .createQueryBuilder("user")
+            .select("user")
+            .where("user.id = :id", { id: userId })
+            .getOne();
+        return a;
     }
-    async createUser(createUserBody) {
-        const { username, email, password } = createUserBody;
+    async findUsernameHaveLikeByTrue(isLike, username) {
+        const repository = (0, typeorm_1.getRepository)(Like_1.Like);
+        const a = repository.find({
+            join: { alias: "like", innerJoin: { user: "like.user" } },
+            where: {
+                like: isLike,
+                user: {
+                    username: username,
+                },
+            },
+        });
+        console.log(a.then((r) => console.log(r)));
+        return "OK";
+    }
+    async findUserAndCommentAndLike(like, userId) {
+        const a = await (0, typeorm_1.getConnection)()
+            .createQueryBuilder(User_1.User, "user")
+            .leftJoinAndSelect("user.like", "like")
+            .leftJoinAndSelect("user.comment", "comment")
+            .where('like.like=:like', { like })
+            .andWhere('user.id =:userId', { userId })
+            .getMany();
+        console.log(a);
+        return "Ok";
+    }
+    async createUser(createUserBody, token) {
+        const { username, email, password, role } = createUserBody;
         try {
-            const exists = await User_1.User.findOne({ email });
+            const promise = await new auth_1.Authorticator(token);
+            const user = await promise.verifyAuthorCreateUser().then((t) => {
+                return t;
+            });
+            console.log(user);
+            const isCheck = await promise.verifyAuthenticator().then((t) => {
+                return t;
+            });
+            if (isCheck) {
+                const repository = (0, typeorm_1.getRepository)(User_1.User);
+                const exists = await repository.findOne({ email });
+                if (exists)
+                    throw new Error("User tồn tại");
+                else {
+                    const encoding = await new encoding_1.Encoding(password);
+                    const hash = await encoding.encoding();
+                    const newUser = new User_1.User();
+                    newUser.username = username;
+                    newUser.email = email;
+                    newUser.password = hash;
+                    newUser.role = role;
+                    return repository.save(newUser);
+                }
+            }
+            else {
+                throw new Error("User not authortion create user!");
+            }
+        }
+        catch (error) {
+            throw new Error(error);
+        }
+    }
+    async createAdmin(createUserBody) {
+        const { username, email, password, role } = createUserBody;
+        try {
+            const repository = (0, typeorm_1.getRepository)(User_1.User);
+            const exists = await repository.findOne({ email });
             if (exists)
                 throw new Error("User tồn tại");
             else {
                 const encoding = await new encoding_1.Encoding(password);
                 const hash = await encoding.encoding();
-                const newUser = User_1.User.create({
-                    username,
-                    email,
-                    password: hash,
-                });
-                return User_1.User.save(newUser);
+                const newUser = new User_1.User();
+                newUser.username = username;
+                newUser.email = email;
+                newUser.password = hash;
+                newUser.role = role;
+                return repository.save(newUser);
             }
         }
         catch (error) {
@@ -46,15 +115,17 @@ let UserResolver = class UserResolver {
     }
     async signIn(email, password) {
         try {
-            const findUser = await User_1.User.findOne({ where: { email } });
+            const repository = (0, typeorm_1.getRepository)(User_1.User);
+            const findUser = await repository.findOne({ email });
             if (findUser !== undefined) {
-                const verifyEncoding = new encoding_1.VerifyEncoding(password, findUser.password);
+                const verifyEncoding = await new encoding_1.VerifyEncoding(password, findUser.password);
                 const isCheck = await verifyEncoding.verifyEncoding();
                 if (isCheck) {
-                    const auth = new auth_1.CreateToken(findUser.email, findUser.id);
+                    const auth = new auth_1.CreateToken(findUser.email, findUser.id, findUser.role);
                     const token = await auth.token().then((t) => {
                         return t;
                     });
+                    console.log(token);
                     return { token };
                 }
                 else {
@@ -72,11 +143,12 @@ let UserResolver = class UserResolver {
     async updateUser(updateBody) {
         const { id, username, email } = updateBody;
         try {
-            const findUser = await User_1.User.findOne({ where: { id } });
+            const manager = (0, typeorm_1.getManager)();
+            const findUser = await manager.findOne(User_1.User, id);
             if (findUser) {
                 findUser.username = username;
                 findUser.email = email;
-                await User_1.User.save(findUser);
+                await manager.save(User_1.User, findUser);
                 return findUser;
             }
             else {
@@ -89,9 +161,20 @@ let UserResolver = class UserResolver {
     }
     async removeUser(id) {
         try {
-            const findUser = await User_1.User.findOne({ where: { id } });
+            const findUser = await (0, typeorm_1.getConnection)()
+                .createQueryBuilder()
+                .select("user")
+                .from(User_1.User, "user")
+                .where("user.id = :id", { id })
+                .getOne();
+            console.log(findUser);
             if (findUser !== undefined) {
-                await User_1.User.remove(findUser);
+                await (0, typeorm_1.getConnection)()
+                    .createQueryBuilder()
+                    .delete()
+                    .from(User_1.User, "user")
+                    .where("user.id = :id", { id })
+                    .execute();
                 const mess = new mess_1.Messages("User delete successfuly!");
                 return mess.showMess();
             }
@@ -105,18 +188,43 @@ let UserResolver = class UserResolver {
     }
 };
 __decorate([
-    (0, type_graphql_1.Query)(),
+    (0, type_graphql_1.Query)(() => User_1.User),
+    __param(0, (0, type_graphql_1.Arg)("userId")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", String)
-], UserResolver.prototype, "helloUser", null);
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "findUser", null);
+__decorate([
+    (0, type_graphql_1.Query)(() => String),
+    __param(0, (0, type_graphql_1.Arg)("isLike")),
+    __param(1, (0, type_graphql_1.Arg)("username")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Boolean, String]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "findUsernameHaveLikeByTrue", null);
+__decorate([
+    (0, type_graphql_1.Query)(() => String),
+    __param(0, (0, type_graphql_1.Arg)("like")),
+    __param(1, (0, type_graphql_1.Arg)("userId")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Boolean, Number]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "findUserAndCommentAndLike", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => User_1.User),
+    __param(0, (0, type_graphql_1.Args)()),
+    __param(1, (0, type_graphql_1.Arg)("token")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_1.CreateUserBody, String]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "createUser", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => User_1.User),
     __param(0, (0, type_graphql_1.Args)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [user_1.CreateUserBody]),
     __metadata("design:returntype", Promise)
-], UserResolver.prototype, "createUser", null);
+], UserResolver.prototype, "createAdmin", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => user_1.SignInResponse),
     __param(0, (0, type_graphql_1.Arg)("email")),
@@ -129,7 +237,7 @@ __decorate([
     (0, type_graphql_1.Mutation)(() => User_1.User),
     __param(0, (0, type_graphql_1.Args)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_1.UpdateUserBody]),
+    __metadata("design:paramtypes", [user_2.UpdateUserBody]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "updateUser", null);
 __decorate([

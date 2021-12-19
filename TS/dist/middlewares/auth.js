@@ -19,14 +19,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateToken = void 0;
+exports.Authorticator = exports.CreateToken = void 0;
 const jwt = __importStar(require("jsonwebtoken"));
 const config_1 = require("../config/config");
 class CreateToken {
-    constructor(dataEmail, dataId) {
+    constructor(dataEmail, dataId, dataRole) {
         this.payload = {
             id: dataId,
             email: dataEmail,
+            role: dataRole,
         };
         this.secretkey = "abc45365";
         this.expires = {
@@ -39,4 +40,21 @@ class CreateToken {
     }
 }
 exports.CreateToken = CreateToken;
+class Authorticator {
+    constructor(token) {
+        this.token = token;
+        this.secretkey = "abc45365";
+    }
+    async verifyAuthorCreateUser() {
+        const user = await jwt.verify(this.token, this.secretkey);
+        return user;
+    }
+    async verifyAuthenticator() {
+        const us = await this.verifyAuthorCreateUser();
+        const extention = ["ADMIN", "SUPPERADMIN"];
+        const isReq = await extention.includes(us.role);
+        return isReq;
+    }
+}
+exports.Authorticator = Authorticator;
 //# sourceMappingURL=auth.js.map

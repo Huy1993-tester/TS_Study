@@ -7,7 +7,7 @@ import { LikeResolver } from "./../resolvers/likeResolver";
 import { MovieResolver } from "../resolvers/movieResolver";
 import { MovieRapResolver } from "../resolvers/movieRapResolver";
 import { RapResolver } from "../resolvers/rapResolver";
-import { Authorticator } from "../middlewares/auth";
+import { authChecker } from './../middlewares/authChecker';
 
 export const createGraphqlSchema = async (): Promise<GraphQLSchema> => {
   return buildSchema({
@@ -19,14 +19,6 @@ export const createGraphqlSchema = async (): Promise<GraphQLSchema> => {
       CommentResolver,
       MovieRapResolver,
     ],
-    authChecker: async ({ context: { req } }) => {
-     const auth =  await new Authorticator(req.headers.authorization);
-       const isCheck =await auth.verifyRole();
-      if (isCheck) {
-        return true;
-      } else {
-        return false;
-      }
-    },
+    authChecker
   });
 };
